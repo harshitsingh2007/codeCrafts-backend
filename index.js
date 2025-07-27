@@ -5,27 +5,26 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const port = process.env.PORT || 4000; // Added fallback port
+const port = process.env.PORT || 4000;
 const app = express();
 
-// Middlewares
+
 app.use(express.json());
 
-// CORS Configuration (updated for production)
 app.use(cors({
   origin: [
-    "http://localhost:3000", // Local development
+    "http://localhost:3000",
     "https://code-crafts-frontend.vercel.app/"
   ],
   credentials: true,
 }));
 
-// Fixed route parameter order
+
 app.get('/', (req, res) => {
     res.send("hello express");
 });
 
-// Routes
+
 app.use('/api/auth', authRoutes);
 
 // Error handling middleware
