@@ -10,7 +10,7 @@ export const Signup =async (req,res)=>{
         const ifUserExists = await user.findOne({ email });
 
         if (ifUserExists) {
-            console.log("User already exists");
+            alert("User already exists");
             return res.status(400).json(
                 { message: "user already exists" }
             )
@@ -23,12 +23,36 @@ export const Signup =async (req,res)=>{
             lastlogin: Date.now(),
             verificationToken
         });
-
+        await newUser.save()
+        
         res.status(201).json({
             message: "user created succesfully",
-        })        
+        })
     } catch (error) {
         console.log(error.message);
+        res.status(500).json({message: "Internal Server Error"});
+    }
+}
+
+export const Login =async (req,res)=>{
+    const {email,password}=req.body;
+    try {
+        const user=await user.findOne({ email });
+        if(!user){
+            return res.status(400).json({message: "invalid credential"});
+        }
+        const isPasswordVerified = await bcrypt.compare(password, user.password);
+        if (isPasswordVerified) {
+            return res.status(400).json({message:"invalid credential"})
+        }
+         
+        user.lastlogin=Date.now()
+        await user.save()
+        res.status(200).json({
+            message:"login successfull"
+        })
+    } catch (error) {
+        console.log(error.message)
         res.status(500).json({message: "Internal Server Error"});
     }
 }
