@@ -39,3 +39,4 @@ app.listen(port, () => {
         .then(() => console.log(`Server running on http://localhost:${port}`))
         .catch(err => console.error("Database connection failed:", err));
 });
+
