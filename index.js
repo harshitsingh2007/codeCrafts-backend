@@ -14,9 +14,10 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://code-crafts-frontend.vercel.app"
   ],
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 
@@ -27,13 +28,12 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Server Error');
 });
 
-// Start server
+
 app.listen(port, () => {
     connectDb()
         .then(() => console.log(`Server running on http://localhost:${port}`))

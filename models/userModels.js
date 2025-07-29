@@ -18,6 +18,10 @@ const userSchema= new mongoose.Schema({
         type:Boolean,
         default:false,
     },
+    varificationToken:String,
+    varificationTokenExpiry:String,
+    resetpassword:String,
+    resetpasswordExpiery:String,
 },{timestamps:true});
 
-export const user=mongoose.model('User',userSchema);
+export const User = mongoose.model('User', userSchema);
