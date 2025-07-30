@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:3000",
+    "https://code-crafts-frontend.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
