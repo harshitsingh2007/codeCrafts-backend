@@ -19,7 +19,7 @@ const userSchema= new mongoose.Schema({
         default:false,
     },
     varificationToken:String,
-    varificationTokenExpiry:String,
+    varificationTokenExpiry:Date,
     resetpassword:String,
     resetpasswordExpiery:String,
 },{timestamps:true});

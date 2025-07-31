@@ -1,15 +1,15 @@
 import express from 'express';
 import { connectDb } from './database/connectDB.js';
 import authRoutes from './routes/authRoutes.js';
+import TemplateRoutes from './routes/TemplateRoutes.js'
 import cors from 'cors';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
-
-
 app.use(express.json());
+// app.use(cookieParser());
 
 app.use(cors({
   origin: [
@@ -28,6 +28,7 @@ app.get('/', (req, res) => {
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/template',TemplateRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
