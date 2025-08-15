@@ -12,14 +12,14 @@ export const getAlltemplate= async (req, res) => {
 
 
 export const addTemplate=async(req,res)=>{
-    const { title, image, description, genre, createdBy } = req.body;
+    const { title, image, description, genre,price } = req.body;
     try {
         const newTemplate = new templateData({
             title,
             image,
             description,
             genre,
-            createdBy,
+           price,
         });
         await newTemplate.save();
         res.status(201).json({ template: newTemplate });
@@ -31,7 +31,7 @@ export const addTemplate=async(req,res)=>{
 
 export const updateTemplate=async(req,res)=>{
     const {id}=req.params;
-    const {title,image,description,genre}=req.body;
+    const {title,image,description,genre,price}=req.body;
     try {
         const res=await templateData.findOneAndUpdate({
             _id:id
@@ -40,6 +40,7 @@ export const updateTemplate=async(req,res)=>{
             image,
             description,
             genre,
+            price,
         })
     } catch (error) {
         console.log('Error updating template:', error.message);

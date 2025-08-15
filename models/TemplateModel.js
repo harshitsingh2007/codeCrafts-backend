@@ -17,6 +17,10 @@ const templateSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    price:{
+        type:Number,
+        required:true,
+    },
 }, { timestamps: true });
 
 export const templateData= mongoose.model("Template",templateSchema);
