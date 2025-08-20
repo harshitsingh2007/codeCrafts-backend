@@ -1,22 +1,23 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
-export const verifyToken = (req,res)=>{
-    const token=req.cookies.token;
-    if(!token){
-        return res.status(401).json({message: "Unauthorized"});
-    }
+export const verifyToken = (req, res, next) => {
     try {
-        const decoded= jwt.verify(token,process.env.JWT_SECRET);
-        if(!decoded){
-            return res.status(401).json({message: "Unauthorized"});
+        const token = req.cookies?.token; 
+        
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized, no token provided" });
         }
-        req.user = decoded.userId;
-        next();
 
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded) {
+            return res.status(401).json({ message: "Unauthorized, invalid token" });
+        }
+
+        req.user = decoded.userId; 
+        next(); 
     } catch (error) {
-        console.log("Error in verifyToken ", error);
-		return res.status(500).json({ success: false, message: "Server error" });
+        console.error("Error in verifyToken:", error.message);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
-
-}
-
+};

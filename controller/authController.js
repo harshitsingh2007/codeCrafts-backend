@@ -2,7 +2,7 @@ import {User} from '../models/userModels.js'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { generateToken } from "../utils/generateToken.js";
-
+import {sendEmailVerification} from '../mailTrap/email.js'
 
 export const Signup =async (req,res)=>{
     const {email,password,name,Identity}=req.body;
@@ -19,20 +19,22 @@ export const Signup =async (req,res)=>{
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const verificationToken = Math.floor(100000 + Math.random() * 1000000).toString();
+        const varificationToken= Math.floor(100000 + Math.random() * 1000000).toString();
 
         const newUser = await User.create({
-            name,
-            email,
+            name:name,
+            email:email,
             password: hashedPassword,
-            Identity,
-            isVerified: true,
+            Identity:Identity,
             lastlogin: Date.now(),
-            verificationToken,
-            verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000,
+            varificationToken,
+            varificationTokenExpiry: Date.now() + 24 * 60 * 60 * 1000,
         });
 
         generateToken(res, newUser._id);
+
+        //jwt
+        await sendEmailVerification(newUser.email,varificationToken)
 
         await newUser.save();
         res.status(201).json({ message: "User created successfully" });
@@ -80,6 +82,38 @@ export const logout = (req, res) => {
     });
 }
 
+export const verifyEmail = async (req, res) => {
+    const { code } = req.body;
+    try {
+        const user = await User.findOne({
+            varificationToken: code,
+            varificationTokenExpiry: { $gt: Date.now() }
+        });
+    
+        if (!user) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid or expired code" 
+            });
+        }
+        
+        user.isVerified = true;
+        user.varificationToken = undefined;
+        user.varificationTokenExpiry = undefined;
+        await user.save();
+        
+        res.status(200).json({
+            success: true,
+            message: "User verified successfully"
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+}
 
 export const forgotPassword=async(req,res)=>{
     const {email} = req.body;
@@ -113,7 +147,25 @@ export const forgotPassword=async(req,res)=>{
     }
 } 
 
-export const resetpassword =async(req,res)=>{
+export const checkAuth = async(req,res)=>{
+    try {
+        const user=await user.findById(req.user._id).select("-password -__v");
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        console.log("checkAuth error:", error.message);
+        res.json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
+
+export const resetpassword = async(req,res)=>{
    const {token}=req.params;
    const {password}=req.body;
     try {

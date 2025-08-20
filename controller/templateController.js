@@ -10,7 +10,6 @@ export const getAlltemplate= async (req, res) => {
     }
 }
 
-
 export const addTemplate=async(req,res)=>{
     const { title, image, description, genre,price } = req.body;
     try {
