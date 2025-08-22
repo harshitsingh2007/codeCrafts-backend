@@ -32,3 +32,24 @@ export const sendEmailVerification = async (email, verificationToken) => {
         throw new Error(`Email sending failed: ${error.message}`);
     }
 }
+
+export const sendPasswordResetEmail = async (email, resetToken) => {
+    try {
+        const info = await transporter.sendMail({
+            from: sender,
+            to: email,
+            subject: "Password Reset Request",
+            html: `
+                <h2>Password Reset Request</h2>
+                <p>To reset your password, please use the following link:</p>
+                <a href="https://codecrafts-backend-1.onrender.com/reset-password?token=${resetToken}">Reset Password</a>
+                <p>This link will expire in 1 hours.</p>
+            `,
+        });
+        console.log('Message sent: %s', info.messageId);
+        return info;
+    } catch (error) {
+        console.error('Email sending error:', error);
+        throw new Error(`Email sending failed: ${error.message}`);
+    }
+}

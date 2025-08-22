@@ -28,8 +28,8 @@ const userSchema= new mongoose.Schema({
     },
     varificationToken:String,
     varificationTokenExpiry:Date,
-    resetpassword:String,
-    resetpasswordExpiery:String,
+    resetToken:String,
+    resetTokenExpires:Date,
 },{timestamps:true});
 
 export const User = mongoose.model('User', userSchema);

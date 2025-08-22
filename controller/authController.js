@@ -2,7 +2,7 @@ import {User} from '../models/userModels.js'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { generateToken } from "../utils/generateToken.js";
-import {sendEmailVerification} from '../mailTrap/email.js'
+import {sendEmailVerification, sendPasswordResetEmail} from '../mailTrap/email.js'
 
 export const Signup =async (req,res)=>{
     const {email,password,name,Identity}=req.body;
@@ -62,7 +62,6 @@ export const Login =async (req,res)=>{
             return res.status(400).json({message:"invalid credential"});
         }
         generateToken(res, userexits._id);
- 
         await userexits.save();
         res.status(200).json({
             message:"login successfull"
@@ -115,38 +114,6 @@ export const verifyEmail = async (req, res) => {
     }
 }
 
-export const forgotPassword=async(req,res)=>{
-    const {email} = req.body;
-    try {
-    const user= await User.findOne({email})
-    if(!user){
-        res.status(400).json({
-            success:false,
-            message:"user not founded",
-        })
-    }
-    const resetToken=crypto.randomBytes(30).toString("hex")
-    const resetTokenExpires=1*60*60*1000
-
-    user.resetpassword=resetToken,
-    user.resetpasswordExpiery=resetTokenExpires
-
-    await user.save()
-
-    //nodemailer
-    await sendEmailVerification(user.email, resetToken);
-
-    res.status(201).json({
-        message:"forgot password link sended",
-    }) 
-     }catch (error) {
-        console.log(error.message,"internal server error")
-        res.status(500).json({
-            message:"internal server error"
-        }) 
-    }
-} 
-
 export const checkAuth = async(req,res)=>{
     try {
         const user=await user.findById(req.user._id).select("-password -__v");
@@ -165,13 +132,50 @@ export const checkAuth = async(req,res)=>{
     }
 }
 
-export const resetpassword = async(req,res)=>{
-   const {token}=req.params;
-   const {password}=req.body;
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        
+        const resetTokens = crypto.randomBytes(30).toString("hex");
+        const resetTokenExpire = Date.now() + 1 * 60 * 60 * 1000;
+
+        
+        user.resetToken = resetTokens;
+        user.resetTokenExpires = resetTokenExpire;
+
+        await user.save();
+
+       
+        await sendPasswordResetEmail(user.email, resetTokens);
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset link sent to your email",
+        });
+    } catch (error) {
+        console.log(error.message, "internal server error");
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+
+    
     try {
         const user = await User.findOne({
-            resetpassword: token,
-            resetpasswordExpiery: { $gt: Date.now() }
+            resetToken: token, 
+            resetTokenExpires: { $gt: Date.now() } 
         });
 
         if (!user) {
@@ -180,10 +184,10 @@ export const resetpassword = async(req,res)=>{
                 message: "Invalid or expired reset token"
             });
         }
-
+        
         user.password = await bcrypt.hash(password, 10);
-        user.resetpassword = undefined;
-        user.resetpasswordExpiery = undefined;
+        user.resetToken = undefined; 
+        user.resetTokenExpires = undefined;
 
         await user.save();
 
@@ -191,7 +195,6 @@ export const resetpassword = async(req,res)=>{
             success: true,
             message: "Password reset successful"
         });
-
     } catch (error) {
         console.error('Reset password error:', error.message);
         res.status(500).json({
@@ -199,5 +202,4 @@ export const resetpassword = async(req,res)=>{
             message: "Internal Server Error"
         });
     }
-}
-
+};
