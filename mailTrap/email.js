@@ -42,7 +42,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
             html: `
                 <h2>Password Reset Request</h2>
                 <p>To reset your password, please use the following link:</p>
-                <a href="https://codecrafts-backend.onrender.com/reset-password?token=${resetToken}">Reset Password</a>
+                <a href="https://code-crafts-frontend.vercel.app/reset-password?token=${resetToken}">Reset Password</a>
                 <p>This link will expire in 1 hours.</p>
             `,
         });
