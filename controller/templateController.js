@@ -1,4 +1,5 @@
 import { templateData } from "../models/TemplateModel.js";
+import { uploadONCloudinary } from "../utils/cloudinary.js";
 
 export const getAlltemplate= async (req, res) => {
     try {
@@ -9,28 +10,46 @@ export const getAlltemplate= async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+export const addTemplate = async (req, res) => {
+  try {
+      const file = req.file;
+      if (!file) {
+          return res.status(400).json({ success: false, message: "Image file is required" });
+      }
 
-export const addTemplate=async(req,res)=>{
-    const { title, image, description, genre,price } = req.body;
-    try {
-        const newTemplate = new templateData({
-            title,
-            image,
-            description,
-            genre,
-           price,
-        });
-        await newTemplate.save();
-        res.status(201).json({ template: newTemplate });
-    } catch (error) {
-        console.error('Error adding template:', error.message);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-}
+      const cloudinaryResult= await uploadONCloudinary(file.path);
+      if (!cloudinaryResult) {
+          return res.status(500).json({ success: false, message: "Failed to upload image to Cloudinary" });
+      }
+    const { title, description, genre, Price} = req.body;
 
+    const newTemplate = new templateData({
+      title,
+      description,
+      genre,
+      Price,
+      image: cloudinaryResult.secure_url,
+    });
+
+    await newTemplate.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Template added successfully",
+      template: newTemplate,
+    });
+
+  } catch (error) {
+    console.error("Error adding template:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 export const updateTemplate=async(req,res)=>{
     const {id}=req.params;
-    const {title,image,description,genre,price}=req.body;
+    const {title,image,description,genre,Price}=req.body;
     try {
         const res=await templateData.findOneAndUpdate({
             _id:id
@@ -39,7 +58,7 @@ export const updateTemplate=async(req,res)=>{
             image,
             description,
             genre,
-            price,
+            Price,
         })
     } catch (error) {
         console.log('Error updating template:', error.message);

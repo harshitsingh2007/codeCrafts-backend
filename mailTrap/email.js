@@ -1,4 +1,5 @@
 import nodeMailer from 'nodemailer';
+import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE } from './emailTemplate.js';
 
 const transporter = nodeMailer.createTransport({
     service: 'gmail',
@@ -19,11 +20,7 @@ export const sendEmailVerification = async (email, verificationToken) => {
             from: sender,
             to: email,
             subject: "Email Verification",
-            html: `
-                <h2>Please verify your email</h2>
-                <p>Your verification code is: <strong>${verificationToken}</strong></p>
-                <p>This code will expire in 24 hours.</p>
-            `,
+            html:VERIFICATION_EMAIL_TEMPLATE.replace('{verificationCode}', verificationToken),
         });
         console.log('Message sent: %s', info.messageId);
         return info;
@@ -39,12 +36,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
             from: sender,
             to: email,
             subject: "Password Reset Request",
-            html: `
-                <h2>Password Reset Request</h2>
-                <p>To reset your password, please use the following link:</p>
-                <a href="https://code-crafts-frontend.vercel.app/reset-password?token=${resetToken}">Reset Password</a>
-                <p>This link will expire in 1 hours.</p>
-            `,
+            html:PASSWORD_RESET_REQUEST_TEMPLATE.replace('{resetURL}', `http://localhost:3000/reset-password?token=${resetToken}`),
         });
         console.log('Message sent: %s', info.messageId);
         return info;

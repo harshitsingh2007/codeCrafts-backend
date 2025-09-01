@@ -11,13 +11,11 @@ export const Signup =async (req,res)=>{
             return res.status(400).json({message: "Email and Password are required"});
         }
         const ifUserExists = await User.findOne({ email });
-
         if (ifUserExists) {
             return res.status(400).json(
                 { message: "user already exists" }
             )
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const varificationToken= Math.floor(100000 + Math.random() * 1000000).toString();
 

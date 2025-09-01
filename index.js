@@ -4,12 +4,13 @@ import authRoutes from './routes/authRoutes.js';
 import TemplateRoutes from './routes/TemplateRoutes.js'
 import cors from 'cors';
 import dotenv from 'dotenv';
-
+import FreelancerRoutes from './routes/FreelancerRoutes.js';
 dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
-// app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use('/add-template', express.static('uploads'));
 
 app.use(cors({
   origin: [
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/template',TemplateRoutes);
+app.use('/api/freeLancer',FreelancerRoutes)
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
