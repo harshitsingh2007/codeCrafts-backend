@@ -1,16 +1,33 @@
-import express from 'express';
-import { Signup,Login, logout, forgotPassword, resetPassword, checkAuth, verifyEmail} from '../controller/authController.js';
-import { verifyToken } from '../middleware/verifyToken.js';
+import express from "express";
+import passport from "../middleware/passport.js";
+import {
+  Signup,
+  Login,
+  logout,
+  verifyEmail,
+  checkAuth,
+  forgotPassword,
+  resetPassword,
+  googleLogin,
+} from "../controller/authController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
+
 const router = express.Router();
-router.get("/check-auth",verifyToken,checkAuth)
-router.post('/signup',Signup);
-router.post('/login',Login)
-router.post('/logout',logout)
-router.post('/verify-email',verifyEmail,)
-router.post('/forgot-password',forgotPassword)
-router.post('/reset-password',resetPassword)
+
+router.post("/signup", Signup);
+router.post("/login", Login);
+router.post("/logout", logout);
+router.post("/verify-email", verifyEmail);
+router.get("/check-auth", verifyToken, checkAuth);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false, failureRedirect: "/signup" }),
+  googleLogin
+);
 
 export default router;
-

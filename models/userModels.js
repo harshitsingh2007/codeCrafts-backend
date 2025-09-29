@@ -26,6 +26,18 @@ const userSchema= new mongoose.Schema({
         type:String,
         required:true,
     },
+    isFreeLancer:{
+        type:Boolean,
+        default:false,
+    },
+    FreelancerId:{
+        type:String,
+    },
+    googleId: { 
+    type: String, 
+    unique: true, 
+    sparse: true 
+    }, 
     varificationToken:String,
     varificationTokenExpiry:Date,
     resetToken:String,

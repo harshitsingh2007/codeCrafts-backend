@@ -6,4 +6,5 @@ const router= express.Router();
 router.post('/create',CreateFreeLancer);
 router.get('/all',fetchAllFreelancer);
 
+
 export default router;

@@ -4,6 +4,8 @@ import authRoutes from './routes/authRoutes.js';
 import TemplateRoutes from './routes/TemplateRoutes.js'
 import cors from 'cors';
 import dotenv from 'dotenv';
+import passport from'./middleware/passport.js';
+import Contact from './routes/Contact.js';
 import FreelancerRoutes from './routes/FreelancerRoutes.js';
 dotenv.config();
 const port = process.env.PORT || 4000;
@@ -31,6 +33,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/template',TemplateRoutes);
 app.use('/api/freeLancer',FreelancerRoutes)
+app.use('/api/contact',Contact)
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

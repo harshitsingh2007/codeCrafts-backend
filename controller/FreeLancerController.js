@@ -1,108 +1,113 @@
 import { FreeLancerModel } from "../models/FreeLancerModels.js";
+import { User } from "../models/userModels.js";
 
-export const fetchAllFreelancer=async(req,res)=>{
+export const fetchAllFreelancer = async (req, res) => {
     try {
-        const freelancers=await FreeLancerModel.find();
+        const freelancers = await FreeLancerModel.find();
         res.status(200).json({
-            success:true,
-            data:freelancers
-        })
+            success: true,
+            data: freelancers
+        });
     } catch (error) {
         console.log("fetchAllFreelancer error:", error.message);
         res.status(500).json({
-            success:false,
-            message:"Internal Server Error"
-        })
-    }
-}
-export const CreateFreeLancer=async(req,res)=>{
-    const {name,email,skills,about,phoneNo,Location,Language,role,Image}=req.body;
-    try {
-        const newFreeLancer=await FreeLancerModel.create({
-            name,
-            email,
-            skills,
-            about,
-            phoneNo,
-            Location,
-            Language,
-            role,
-            Image
+            success: false,
+            message: "Internal Server Error"
         });
-        await newFreeLancer.save();
+    }
+};
+
+export const CreateFreeLancer = async (req, res) => {
+    const { name, email, skills, about, phoneNo, Location, Language, role, Image } = req.body;
+
+    if (!name || !name.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Name is required."
+        });
+    }
+
+    if (!email || !email.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Email is required."
+        });
+    }
+
+    if (!role || !role.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Role is required."
+        });
+    }
+
+  
+    if (!Image || !Image.startsWith('http')) {
+        return res.status(400).json({
+            success: false,
+            message: "Valid image URL is required."
+        });
+    }
+
+    try {
+        const existingFreelancer = await FreeLancerModel.findOne({ email });
+        if (existingFreelancer) {
+            return res.status(400).json({
+                success: false,
+                message: "Freelancer with this email already exists."
+            });
+        }
+
+        const skillsArray = Array.isArray(skills) ? skills : (skills ? [skills] : []);
+        const languageArray = Array.isArray(Language) ? Language : (Language ? [Language] : []);
+
+        const newFreeLancer = await FreeLancerModel.create({
+            name: name.trim(),
+            email: email.trim(),
+            skills: skillsArray,
+            about: about || "",
+            phoneNo: phoneNo || "",
+            Location: Location || "",
+            Language: languageArray,
+            role: role.trim(),
+            Image: Image
+        });
+
+        const user = await User.findOne({ email: email.trim() });
+        if (user) {
+            user.isFreeLancer = true;
+            user.FreelancerId = newFreeLancer._id;
+            await user.save();
+        }
+
+        console.log("Freelancer created successfully:", newFreeLancer._id);
+
         res.status(201).json({
-            success:true,
-            message:"FreeLancer profile created successfully",
-            data:newFreeLancer
+            success: true,
+            message: "Freelancer profile created successfully",
+            data: newFreeLancer
         });
     } catch (error) {
         console.log("CreateFreeLancer error:", error.message);
-        res.status(500).json({
-            success:false,
-            message:"Internal Server Error"
-        })
-    }
-}
-
-export const updateFreeLancer=async(req,res)=>{
-    const {id}=req.params;
-    const {name,email,skills,about,phoneNo,Location,Language,role,Image}=req.body;
-    try {
-        const updatedFreeLancer=await FreeLancerModel.findByIdAndUpdate(
-            id,
-            {
-                name,
-                email,
-                skills,
-                about,
-                phoneNo,
-                Location,
-                Language,
-                role,
-                Image
-            },
-            {new:true}
-        );
-        if(!updatedFreeLancer){
-            return res.status(404).json({
-                success:false,
-                message:"FreeLancer not found"
+        
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: "Freelancer with this email already exists."
             });
         }
-        res.status(200).json({
-            success:true,
-            message:"FreeLancer profile updated successfully",
-            data:updatedFreeLancer
-        });
-    } catch (error) {
-        console.log("updateFreeLancer error:", error.message);
-        res.status(500).json({
-            success:false,
-            message:"Internal Server Error"
-        })
-    }
-}
-
-export const deleteFreeLancer=async(req,res)=>{
-    const {id}=req.params;
-    try {
-        const deletedFreeLancer=await FreeLancerModel.findByIdAndDelete(id);
-        if(!deletedFreeLancer){
-            return res.status(404).json({
-                success:false,
-                message:"FreeLancer not found"
+        
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: errors.join(', ')
             });
         }
-        res.status(200).json({
-            success:true,
-            message:"FreeLancer profile deleted successfully",
-            data:deletedFreeLancer
-        });
-    } catch (error) {
-        console.log("deleteFreeLancer error:", error.message);
+        
         res.status(500).json({
-            success:false,
-            message:"Internal Server Error"
-        })
+            success: false,
+            message: "Internal Server Error: " + error.message
+        });
     }
-}
+};
