@@ -3,24 +3,36 @@ import mongoose from "mongoose";
 const templateSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        // required: true,
     },
     image: {
         type: String, 
-        required: true,
+        // required: true,
     },
     description: {
         type: String,
-        required: true,
+        // required: true,
     },
     genre: {
         type: String,
-        required: true,
+        // required: true,
     },
     Price:{
         type:Number,
-        required:true,
+        // required:true,
     },
+    OwnerId:{
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User", 
+    //   required: true,
+    },
+      SavedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: [],
+    },
+  ],
 }, { timestamps: true });
 
 export const templateData= mongoose.model("Template",templateSchema);

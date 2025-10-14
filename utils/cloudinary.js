@@ -5,7 +5,7 @@ const uploadONCloudinary = async (file, type = 'template') => {
   const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 
-  console.log('🔧 Upload Configuration:', {
+  console.log('Upload Configuration:', {
     cloudName,
     uploadPreset,
     file: file.name,
@@ -59,12 +59,12 @@ const uploadONCloudinary = async (file, type = 'template') => {
     }
 
     const data = JSON.parse(responseText);
-    console.log('✅ Upload Successful:', data);
+    console.log('Upload Successful:', data);
     
     setUploading(false);
     return data.secure_url;
   } catch (error) {
-    console.error('❌ Upload Error:', error);
+    console.error('Upload Error:', error);
     setUploading(false);
     throw new Error(`Upload failed: ${error.message}`);
   }

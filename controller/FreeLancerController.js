@@ -20,6 +20,8 @@ export const fetchAllFreelancer = async (req, res) => {
 export const CreateFreeLancer = async (req, res) => {
     const { name, email, skills, about, phoneNo, Location, Language, role, Image } = req.body;
 
+    const {token}=req.params;
+
     if (!name || !name.trim()) {
         return res.status(400).json({
             success: false,
@@ -41,6 +43,7 @@ export const CreateFreeLancer = async (req, res) => {
         });
     }
 
+
   
     if (!Image || !Image.startsWith('http')) {
         return res.status(400).json({
@@ -50,7 +53,7 @@ export const CreateFreeLancer = async (req, res) => {
     }
 
     try {
-        const existingFreelancer = await FreeLancerModel.findOne({ email });
+        const existingFreelancer = await FreeLancerModel.findOne({ email, });
         if (existingFreelancer) {
             return res.status(400).json({
                 success: false,

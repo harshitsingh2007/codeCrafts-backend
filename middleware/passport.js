@@ -12,9 +12,11 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-              let user = await User.findOne({ googleId: profile.id });
-
-        if (!user) {
+        let user = await User.findOne({email: profile.emails[0].value});
+        if(user){
+          return done(null, user);
+        }
+        else{
           user = await User.create({
             googleId: profile.id,
             name: profile.displayName,
@@ -24,7 +26,6 @@ passport.use(
             password: null, 
           });
         }
-
         done(null, user);
       } catch (err) {
         done(err, null);

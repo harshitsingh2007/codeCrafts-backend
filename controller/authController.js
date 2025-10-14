@@ -29,6 +29,7 @@ export const Signup = async (req, res) => {
     });
 
     generateToken(res, newUser._id);
+   
     await sendEmailVerification(newUser.email, varificationToken);
 
     res.status(201).json({ message: "User created successfully" });
@@ -91,15 +92,17 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const checkAuth = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("-password -__v");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error("checkAuth error:", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
+	try {
+		const user = await User.findById(req.user).select("-password");
+		if (!user) {
+			return res.status(400).json({ success: false, message: "User not found" });
+		}
+		res.status(200).json({ success: true, user });
+	} catch (error) {
+		console.log("Error in checkAuth ", error);
+		res.status(400).json({ success: false, message: error.message });
+	}
+}
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -124,7 +127,8 @@ export const forgotPassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { token, password } = req.body;
+  const {token}=req.params;
+  const { password } = req.body;
   try {
     const user = await User.findOne({
       resetToken: token,

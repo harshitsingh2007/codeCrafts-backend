@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv'
+dotenv.config()
 
 export const verifyToken = (req, res, next) => {
     try {
@@ -21,3 +23,16 @@ export const verifyToken = (req, res, next) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
+
+export const verifyAdmin=(req,res,next)=>{
+    try {
+        if(req.user.role!=="admin"){
+            return res.status(403).json({message:"Forbidden, admin access required"})
+        }
+        next()
+    } catch (error) {
+        console.error("Error in verifyAdmin:", error.message);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+}

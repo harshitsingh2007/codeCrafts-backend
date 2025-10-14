@@ -36,7 +36,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
             from: sender,
             to: email,
             subject: "Password Reset Request",
-            html:PASSWORD_RESET_REQUEST_TEMPLATE.replace('{resetURL}', `http://localhost:3000/reset-password?token=${resetToken}`),
+            html:PASSWORD_RESET_REQUEST_TEMPLATE.replace('{resetURL}', `http://localhost:3000/reset-password/${resetToken}`),
         });
         console.log('Message sent: %s', info.messageId);
         return info;

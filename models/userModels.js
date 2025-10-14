@@ -3,16 +3,13 @@ import mongoose from 'mongoose';
 const userSchema= new mongoose.Schema({
     name:{
         type: String,
-        required: true,
     },
     email:{
         type: String,
-        required: true,
         unique:true,
     },
     password:{
         type:String,
-        required: true,
     },
     lastLogin:{
         type:Date,
@@ -22,13 +19,15 @@ const userSchema= new mongoose.Schema({
         type:Boolean,
         default:false,
     },
+    isadmin:{
+        type :Boolean,
+    },
     Identity:{
         type:String,
-        required:true,
     },
     isFreeLancer:{
         type:Boolean,
-        default:false,
+        // default:false,
     },
     FreelancerId:{
         type:String,
@@ -37,7 +36,7 @@ const userSchema= new mongoose.Schema({
     type: String, 
     unique: true, 
     sparse: true 
-    }, 
+    },
     varificationToken:String,
     varificationTokenExpiry:Date,
     resetToken:String,

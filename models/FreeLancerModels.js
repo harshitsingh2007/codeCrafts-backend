@@ -35,7 +35,7 @@ const FreeLancerschema=new mongoose.Schema({
     },
     Language:{
        type:[String], 
-        required:true,
+    required:true,
     }
     
 })

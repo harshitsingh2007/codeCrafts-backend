@@ -4,20 +4,20 @@ import authRoutes from './routes/authRoutes.js';
 import TemplateRoutes from './routes/TemplateRoutes.js'
 import cors from 'cors';
 import dotenv from 'dotenv';
-import passport from'./middleware/passport.js';
-import Contact from './routes/Contact.js';
 import FreelancerRoutes from './routes/FreelancerRoutes.js';
+import cookieParser from 'cookie-parser'
+import CartRoutes from './routes/CartRoutes.js'
 dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/add-template', express.static('uploads'));
 
 app.use(cors({
   origin: [
-    "http://localhost:3000",
-    "https://code-crafts-frontend.vercel.app"
+    "http://localhost:3000"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/template',TemplateRoutes);
 app.use('/api/freeLancer',FreelancerRoutes)
-app.use('/api/contact',Contact)
+app.use('/api/cart',CartRoutes)
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
