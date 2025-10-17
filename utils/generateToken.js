@@ -9,7 +9,8 @@ export const generateToken = (res, userId) => {
         
     res.cookie('token', token, {
         httpOnly: true,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production', // important for HTTPS on Render
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // allow frontend (Vercel)
         maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
     
